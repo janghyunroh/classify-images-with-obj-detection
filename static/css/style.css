@@ -1,0 +1,48 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin-top: 50px;
+    background-color: #f4f4f4;
+}
+
+form {
+    display: inline-block;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: left; /* 폼 내용은 왼쪽 정렬 */
+}
+
+input[type="file"], button {
+    margin-top: 20px;
+}
+
+.checkbox-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.checkbox-item {
+    width: 18%; /* 한 줄에 10개가 넘지 않도록 설정 */
+    margin-bottom: 10px;
+}
+
+#status {
+    margin-top: 20px;
+    font-weight: bold;
+    color: #007bff;
+}
+
+#downloadLink {
+    display: block;
+    margin-top: 20px;
+    color: #007bff;
+    text-decoration: none;
+}
+
+#downloadLink:hover {
+    text-decoration: underline;
+}

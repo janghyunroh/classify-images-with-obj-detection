@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Detection Upload</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <h1>Upload Images for Object Detection</h1>
+    <form id="uploadForm" method="post" enctype="multipart/form-data">
+        <input type="file" id="imageInput" name="file" multiple><br>
+        <h3>Select Labels to Include:</h3>
+        <div class="checkbox-container">
+            {% for label in labels %}
+                <div class="checkbox-item">
+                    <input type="checkbox" name="include_labels" value="{{ label }}"> {{ label }}
+                </div>
+            {% endfor %}
+        </div>
+        <button id="uploadButton" type="submit">Upload and Process</button>
+    </form>
+    <p id="status"></p>
+
+    <script>
+        document.getElementById('uploadForm').onsubmit = function(event) {
+            event.preventDefault();  // 기본 폼 제출 동작 방지
+            var formData = new FormData(this);
+
+            var statusElement = document.getElementById('status');
+            statusElement.textContent = '분류 작업 중입니다. 잠시만 기다려주세요...';
+
+            fetch('/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    statusElement.textContent = '분류 작업이 완료되었습니다. 결과를 다운로드할 수 있습니다.';
+                    return response.blob();
+                } else {
+                    statusElement.textContent = '분류 작업 중 오류가 발생했습니다.';
+                    throw new Error('Network response was not ok.');
+                }
+            })
+            .then(blob => {
+                // 결과 파일 다운로드 처리
+                var url = window.URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'classified_images.zip';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
+        };
+    </script>
+</body>
+</html>
