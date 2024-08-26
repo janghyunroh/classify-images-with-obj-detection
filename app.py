@@ -43,7 +43,8 @@ def upload_files():
             else:
                 save_image_by_category(image, category, filename, CLASSIFIED_FOLDER)
         
-        zip_filepath = zip_directory(CLASSIFIED_FOLDER, ZIP_FILENAME)
+        # 두 개의 폴더를 모두 압축
+        zip_filepath = zip_directories([CLASSIFIED_FOLDER, NO_OBJECTS_FOLDER], ZIP_FILENAME)
         return send_file(zip_filepath, as_attachment=True)
 
     return render_template('index.html', labels=labels)
@@ -86,9 +87,29 @@ def save_image_by_category(image, category, image_name, base_dir=CLASSIFIED_FOLD
     image.save(image_path)
     return image_path
 
-def zip_directory(base_dir, output_filename):
-    shutil.make_archive(output_filename.split('.zip')[0], 'zip', base_dir)
-    return output_filename
+def zip_directories(directories, output_filename):
+    # 압축 파일 이름에서 확장자(.zip)를 제거
+    base_name = output_filename.split('.zip')[0]
+
+    # 임시 디렉토리를 생성하여 파일을 모두 모읍니다.
+    temp_dir = 'temp_for_zip'
+    if not os.path.exists(temp_dir):
+        os.makedirs(temp_dir)
+
+    # 각 디렉토리의 내용을 임시 디렉토리로 복사합니다.
+    for directory in directories:
+        dest_dir = os.path.join(temp_dir, os.path.basename(directory))
+        if os.path.exists(directory):
+            shutil.copytree(directory, dest_dir)
+
+    # 임시 디렉토리를 압축 파일로 만듭니다.
+    shutil.make_archive(base_name, 'zip', root_dir=temp_dir)
+
+    # 임시 디렉토리를 삭제합니다.
+    shutil.rmtree(temp_dir)
+
+    # 압축 파일 경로 반환
+    return f"{base_name}.zip"
 
 def clear_directories(directories):
     """기존의 디렉토리 내의 파일들만 삭제하는 함수"""
